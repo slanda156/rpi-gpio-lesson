@@ -1,0 +1,69 @@
+Sparkline {
+    height: 80%;
+    width: 100%;
+    content-align: center top;
+    margin: 1 0 0 0;
+}
+
+RichLog {
+    height: 95%;
+    width: 100%;
+    content-align: center top;
+}
+
+.tab {
+    height: 5%;
+    width: 13.9%;
+    min-width: 20;
+    min-height: 3;
+    margin: 1 1 1 1;
+    border: solid $accent-darken-2;
+    content-align: center middle;
+}
+
+#selected {
+    background: $accent-darken-1;
+}
+
+.startInput {
+    height: 3;
+    width: 10;
+    content-align: left middle;
+}
+
+.ledRow {
+    height: 3;
+    width: 100%;
+    content-align: left middle;
+}
+
+.ledLabel {
+    height: 100%;
+    width: 9;
+    content-align: left middle;
+}
+
+.ledInput {
+    height: 100%;
+    width: 10;
+    content-align: left middle;
+}
+
+.ledSwitch {
+    height: 100%;
+    width: 10;
+    border: solid $accent-darken-2;
+    content-align: center middle;
+}
+
+#heartRow {
+    height: 3;
+    width: 100%;
+    content-align: left top;
+}
+
+#heartbeatSwitch {
+    height: 100%;
+    width: 10;
+    content-align: left top;
+}

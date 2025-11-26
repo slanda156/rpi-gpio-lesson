@@ -1,0 +1,9 @@
+PyYAML
+coloredlogs
+pytest
+GPUtil
+py-cpuinfo
+textual
+pydantic
+spidev
+gpiozero
