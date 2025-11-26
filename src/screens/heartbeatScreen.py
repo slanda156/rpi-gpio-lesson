@@ -2,8 +2,6 @@ from time import sleep
 from logging import getLogger
 from random import randint
 
-from colorama import init # ToDo Temporary import for testing
-
 import spidev
 import gpiozero
 from textual import work
