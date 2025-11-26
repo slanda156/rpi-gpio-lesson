@@ -36,6 +36,7 @@ class HeartbeatScreen(Screen):
 
     def on_mount(self) -> None:
         self.spi = spidev.SpiDev()
+        logger.info(f"Opening SPI interface on {CONFIG.interfaces.spiInterface}")
         self.spi.open_path(CONFIG.interfaces.spiInterface)
         self.spi.max_speed_hz = 5000
         self.spi.mode = 0b00
