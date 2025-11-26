@@ -1,7 +1,11 @@
 from time import sleep
 from logging import getLogger
-from random import randint # ToDo Temporary import for testing
+from random import randint
 
+from colorama import init # ToDo Temporary import for testing
+
+import spidev
+import gpiozero
 from textual import work
 from textual.app import ComposeResult
 from textual.screen import Screen
@@ -33,8 +37,11 @@ class HeartbeatScreen(Screen):
 
 
     def on_mount(self) -> None:
-        pass
-        # ToDo: Implement the I/O
+        self.spi = spidev.SpiDev()
+        self.spi.open_path(CONFIG.interfaces.spiInterface)
+        self.spi.max_speed_hz = 5000
+        self.spi.mode = 0b00
+        self.heartLED = gpiozero.LED(CONFIG.interfaces.heartbeatPin, initial_value=False)
 
 
     def updateHeartbeat(self, value: int) -> None:
@@ -52,9 +59,17 @@ class HeartbeatScreen(Screen):
     @work(thread=True)
     def updateGPIO(self) -> None:
         heartbeatLEDState = self.query_one("#heartbeatSwitch", Switch).value
-        # ToDo: Implement the change to I/O
+        self.heartLED.value = heartbeatLEDState
         if heartbeatLEDState:
-            self.updateHeartbeat(randint(0, 255))
+            cmd = [0b00000001, 0b10000000, 0b00000000]
+            rawValue = self.spi.xfer2(cmd)
+            if len(rawValue) != 3:
+                logger.error("Invalid SPI response length for Heartbeat Sensor")
+                sleep(0.1)
+                return
+            bitValue = ((rawValue[1] & 3) << 8) | rawValue[2]
+            value = int((bitValue / 1023) * 100)
+            self.updateHeartbeat(value)
         else:
             self.updateHeartbeat(0)
         sleep(0.1)
