@@ -4,6 +4,7 @@ import logging
 from textual.app import App
 from textual.widgets import RichLog
 from textual.css.query import NoMatches
+from textual._context import NoActiveAppError
 
 
 class RichLogHandler(logging.Handler):
@@ -47,7 +48,10 @@ class RichLogHandler(logging.Handler):
         msg = self.format(record)
         msg = f"[{logColor}]{msg}[/{logColor}]"
         if self.richLog:
-            self.richLog.write(msg)
+            try:
+                self.richLog.write(msg)
+            except NoActiveAppError:
+                self.buffer.append(msg)
         else:
             if self.buffer:
                 self.loadBuffer()
