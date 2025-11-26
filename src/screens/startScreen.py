@@ -1,4 +1,5 @@
-from calendar import c
+import subprocess
+import os
 from logging import getLogger
 
 from textual.app import ComposeResult
@@ -73,8 +74,14 @@ class StartScreen(Screen):
             with Horizontal():
                 yield Label("SPI Interface:")
                 with RadioSet():
-                    yield RadioButton("SPI0.0", classes="startInput", id="spi00")
-                    yield RadioButton("SPI0.1", classes="startInput", id="spi01")
+                    if os.name == "posix":
+                        cmdResult = subprocess.run(["ls", "/dev/spi*"], capture_output=True, text=True)
+                        interfaces = cmdResult.stdout.strip().splitlines()
+                        for interface in interfaces:
+                            interfaceName = interface.replace("/dev/", "")
+                            yield RadioButton(interfaceName, id=interfaceName)
+                    else:
+                        raise NotImplementedError("Only POSIX systems are supported.")
         yield Footer()
 
 
