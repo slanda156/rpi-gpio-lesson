@@ -1,5 +1,5 @@
-import subprocess
 import os
+import glob
 from logging import getLogger
 
 from textual.app import ComposeResult
@@ -75,11 +75,16 @@ class StartScreen(Screen):
                 yield Label("SPI Interface:")
                 with RadioSet():
                     if os.name == "posix":
-                        cmdResult = subprocess.run(["ls", "/dev/spi*"], capture_output=True, text=True)
-                        interfaces = cmdResult.stdout.strip().splitlines()
+                        paths = glob.glob("/dev/spi*")
+                        logger.debug(f"Avialbale paths: {paths}")
+                        interfaces = [path for path in paths]
+                        logger.debug(f"Available SPI interfaces: {interfaces}")
+                        if len(interfaces) == 0:
+                            raise Exception("No spi interfaces found")
                         for interface in interfaces:
                             interfaceName = interface.replace("/dev/", "")
-                            yield RadioButton(interfaceName, id=interfaceName)
+                            interfaceId = interfaceName.replace(".", "")
+                            yield RadioButton(interfaceName, classes="spiList", id=interfaceId)
                     else:
                         raise NotImplementedError("Only POSIX systems are supported.")
         yield Footer()
@@ -92,6 +97,10 @@ class StartScreen(Screen):
         self.query_one("#tiltPin", Input).value = str(CONFIG.interfaces.tiltPin)
         self.query_one("#heartbeatPin", Input).value = str(CONFIG.interfaces.heartbeatPin)
         spiInterface = CONFIG.interfaces.spiInterface.lower().replace(".", "")
+        if spiInterface == "":
+            spiInterface = self.query_one(".spiList", RadioButton).id
+            if spiInterface is None:
+                raise Exception("No spi interface found")
         self.query_one(f"#{spiInterface}", RadioButton).value = True
 
 
@@ -115,6 +124,5 @@ class StartScreen(Screen):
         if not interface:
             logger.warning("No SPI interface selected.")
             return
-        interface = interface.upper()
-        interface = interface[:4] +  "." + interface[4:]
+        interface = interface[:-1] +  "." + interface[-1:]
         CONFIG.interfaces.spiInterface = interface
