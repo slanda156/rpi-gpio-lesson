@@ -14,7 +14,7 @@ class InterfaceConfigModel(BaseModel):
     bluePin: int = 18
     tiltPin: int = 17
     heartbeatPin: int = 22
-    spiInterface: str = Field(default="SPI0.0", pattern=r"SPI\d.\d")
+    spiInterface: str = Field(default="")
 
 
 class ConfigModel(BaseModel):
