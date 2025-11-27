@@ -10,7 +10,7 @@ if [ -d ".venv" ]; then
         echo ".venv already exists. Skipping creation."
     else
         echo "Overriding: recreating .venv..."
-        python -m virtualenv .venv
+        python -m virtualenv --system-site-packages .venv
     fi
 else
     echo "Creating virtual environment..."

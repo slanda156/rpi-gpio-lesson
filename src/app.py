@@ -1,7 +1,7 @@
 from logging import getLogger
 
 from textual import on
-from textual.app import App, ComposeResult, ScreenError
+from textual.app import App, ComposeResult
 from textual.reactive import reactive
 from textual.widgets import Footer, Header, Label
 from textual.events import Click
