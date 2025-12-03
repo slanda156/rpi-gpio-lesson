@@ -50,19 +50,6 @@ class LedScreen(Screen):
                 with Horizontal(classes="ledRow"):
                     yield Label("Blue:", classes="ledLabel")
                     yield Switch(classes="ledSwitch", id="blueSwitch")
-            with Vertical():
-                with Horizontal(classes="ledRow"):
-                    yield Label("PWM:", classes="ledLabel")
-                    yield Switch(classes="ledSwitch", id="pwmEnableSwitch")
-                with Horizontal(classes="ledRow"):
-                    yield Label("Red:", classes="ledLabel")
-                    yield Input(type="integer", classes="ledInput", id="redPWM", validators=LEDPWMValidator(), value="0", select_on_focus=True, disabled=True)
-                with Horizontal(classes="ledRow"):
-                    yield Label("Green:", classes="ledLabel")
-                    yield Input(type="integer", classes="ledInput", id="greenPWM", validators=LEDPWMValidator(), value="0", select_on_focus=True, disabled=True)
-                with Horizontal(classes="ledRow"):
-                    yield Label("Blue:", classes="ledLabel")
-                    yield Input(type="integer", classes="ledInput", id="bluePWM", validators=LEDPWMValidator(), value="0", select_on_focus=True, disabled=True)
         yield Footer()
 
 
@@ -71,35 +58,13 @@ class LedScreen(Screen):
             red=CONFIG.interfaces.redPin,
             green=CONFIG.interfaces.greenPin,
             blue=CONFIG.interfaces.bluePin,
-            initial_value=(0, 0, 0),
+            initial_value=(False, False, False),
             pwm=False
         )
 
 
-    def on_input_blurred(self, event: Input.Changed) -> None:
-        if not self.query_one("#pwmEnableSwitch", Switch).value:
-            return
-        if not event.value.isdecimal():
-            return
-        pwmValue = int(event.value)
-        if event.input.id == "redPWM":
-            logger.info(f"Set Red LED PWM to {pwmValue}%")
-            self.led.red = pwmValue / 100
-        elif event.input.id == "greenPWM":
-            logger.info(f"Set Green LED PWM to {pwmValue}%")
-            self.led.green = pwmValue / 100
-        elif event.input.id == "bluePWM":
-            logger.info(f"Set Blue LED PWM to {pwmValue}%")
-            self.led.blue = pwmValue / 100
-
-
     def on_switch_changed(self, event: Switch.Changed) -> None:
-        pwm = self.query_one("#pwmEnableSwitch", Switch).value
-        if event.switch.id == "pwmEnableSwitch":
-            self.query_one("#redPWM", Input).disabled = not event.value
-            self.query_one("#greenPWM", Input).disabled = not event.value
-            self.query_one("#bluePWM", Input).disabled = not event.value
-        elif event.switch.id in ("redSwitch", "greenSwitch", "blueSwitch"):
+        if event.switch.id in ("redSwitch", "greenSwitch", "blueSwitch"):
             logger.info(f"{event.switch.id} turned {'ON' if event.value else 'OFF'}")
             if event.switch.id == "redSwitch":
                 i = 0
@@ -108,15 +73,7 @@ class LedScreen(Screen):
             else:
                 i = 2
             values = list(self.led.value)
-            if not event.value:
-                values[i] = 0
-            else:
-                if not pwm:
-                    values[i] = 1
-                else:
-                    pwmValue = self.query_one(f"#{event.switch.id[:-6]}PWM", Input).value
-                    if pwmValue.isdecimal():
-                        values[i] = int(pwmValue) / 100
+            values[i] = event.value
             self.led.value = tuple(values)
         else:
             logger.debug(f"Unknown switch changed: {event.switch.id}")
