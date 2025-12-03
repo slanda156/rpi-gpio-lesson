@@ -65,7 +65,7 @@ class HeartbeatScreen(Screen):
             data = []
         else:
             data = list(data)
-        data.append(diffValue * (100 / maxDiff))
+        data.append(diffValue * (100 / maxDiff) if maxDiff != 0 else 0)
         while len(data) > 100:
             data.pop(0)
         spark.data = data
