@@ -32,7 +32,7 @@ class TiltScreen(Screen):
 
 
     def on_mount(self) -> None:
-        self.tiltSens = gpiozero.InputDevice(CONFIG.interfaces.tiltPin, pull_up=True)
+        self.tiltSens = gpiozero.DigitalInputDevice(CONFIG.interfaces.tiltPin, pull_up=True)
         self.tiltSens.when_activated = self.switchOff
         self.tiltSens.when_deactivated = self.switchOn
 
