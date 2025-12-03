@@ -27,7 +27,7 @@ class TiltScreen(Screen):
             yield Label("Logging", classes="tab")
         with Horizontal():
             yield Label("Tilt Switch State:")
-            yield Switch(disabled=True, id="tiltSwitchState")
+            yield Switch(disabled=True, id="tiltSwitchState", animate=False)
         yield Footer()
 
 
