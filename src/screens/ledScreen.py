@@ -1,5 +1,6 @@
 from logging import getLogger
 
+import gpiozero
 from textual import work
 from textual.app import ComposeResult
 from textual.screen import Screen
@@ -66,8 +67,12 @@ class LedScreen(Screen):
 
 
     def on_mount(self) -> None:
-        # ToDo: Implement the I/O
-        pass
+        self.led = gpiozero.RGBLED(
+            red=CONFIG.interfaces.redPin,
+            green=CONFIG.interfaces.greenPin,
+            blue=CONFIG.interfaces.bluePin,
+            initial_value=(0, 0, 0)
+        )
 
 
     def on_input_blurred(self, event: Input.Changed) -> None:
@@ -78,41 +83,38 @@ class LedScreen(Screen):
         pwmValue = int(event.value)
         if event.input.id == "redPWM":
             logger.info(f"Set Red LED PWM to {pwmValue}%")
-            self.updateGPIO(pin=CONFIG.interfaces.redPin, mode="PWM", value=pwmValue)
+            self.led.red = pwmValue / 100
         elif event.input.id == "greenPWM":
             logger.info(f"Set Green LED PWM to {pwmValue}%")
-            self.updateGPIO(pin=CONFIG.interfaces.greenPin, mode="PWM", value=pwmValue)
+            self.led.green = pwmValue / 100
         elif event.input.id == "bluePWM":
             logger.info(f"Set Blue LED PWM to {pwmValue}%")
-            self.updateGPIO(pin=CONFIG.interfaces.bluePin, mode="PWM", value=pwmValue)
+            self.led.blue = pwmValue / 100
 
 
     def on_switch_changed(self, event: Switch.Changed) -> None:
+        pwm = self.query_one("#pwmEnableSwitch", Switch).value
         if event.switch.id == "pwmEnableSwitch":
             self.query_one("#redPWM", Input).disabled = not event.value
             self.query_one("#greenPWM", Input).disabled = not event.value
             self.query_one("#bluePWM", Input).disabled = not event.value
-        elif event.switch.id == "redSwitch":
-            logger.info(f"Red LED turned {'ON' if event.value else 'OFF'}")
-        elif event.switch.id == "greenSwitch":
-            logger.info(f"Green LED turned {'ON' if event.value else 'OFF'}")
-        elif event.switch.id == "blueSwitch":
-            logger.info(f"Blue LED turned {'ON' if event.value else 'OFF'}")
+        elif event.switch.id in ("redSwitch", "greenSwitch", "blueSwitch"):
+            logger.info(f"{event.switch.id} turned {'ON' if event.value else 'OFF'}")
+            if event.switch.id == "redSwitch":
+                i = 0
+            elif event.switch.id == "greenSwitch":
+                i = 1
+            else:
+                i = 2
+            values = list(self.led.value)
+            if not event.value:
+                values[i] = 0
+            else:
+                if not pwm:
+                    values[i] = 1
+                else:
+                    pwmValue = self.query_one(f"#{event.switch.id[:-6]}PWM", Input).value
+                    if pwmValue.isdecimal():
+                        values[i] = int(pwmValue) / 100
         else:
             logger.debug(f"Unknown switch changed: {event.switch.id}")
-
-
-    @work(thread=True)
-    def updateGPIO(self, pin: int, mode: str, value: int) -> None:
-        # ToDo: Implement the change to I/O
-        pass
-
-
-    def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
-        if event.worker.state not in {WorkerState.RUNNING, WorkerState.SUCCESS}:
-            logger.debug(f"Worker state changed: {event.worker.name} is now {event.worker.state.name}")
-
-
-    def on_screen_suspend(self) -> None:
-        for worker in self.workers:
-            worker.cancel()

@@ -1,6 +1,7 @@
 from time import sleep
 from logging import getLogger
 
+import gpiozero
 from textual import work
 from textual.app import ComposeResult
 from textual.screen import Screen
@@ -31,8 +32,9 @@ class TiltScreen(Screen):
 
 
     def on_mount(self) -> None:
-        # ToDo: Implement the I/O
-        pass
+        self.tiltSens = gpiozero.InputDevice(CONFIG.interfaces.tiltPin, pull_up=True)
+        self.tiltSens.when_activated = self.switchOff
+        self.tiltSens.when_deactivated = self.switchOn
 
 
     def changeSwitchState(self, state: bool) -> None:
@@ -42,25 +44,9 @@ class TiltScreen(Screen):
         self.query_one("#tiltSwitchState", Switch).disabled = True
 
 
-    @work(thread=True)
-    def updateGPIO(self, pin: int) -> None:
-        # ToDo: Implement the change to I/O
-        self.changeSwitchState(state=True)
-        sleep(0.1)
+    def switchOn(self) -> None:
+        self.changeSwitchState(True)
 
 
-    def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
-        if event.worker.state not in {WorkerState.RUNNING, WorkerState.SUCCESS}:
-            logger.debug(f"Worker state changed: {event.worker.name} is now {event.worker.state.name}")
-        if event.worker.name == "updateGPIO":
-            if event.worker.state in {WorkerState.ERROR, WorkerState.SUCCESS}:
-                self.updateGPIO(pin=CONFIG.interfaces.tiltPin)
-
-
-    def on_screen_resume(self) -> None:
-        self.updateGPIO(pin=CONFIG.interfaces.tiltPin)
-
-
-    def on_screen_suspend(self) -> None:
-        for worker in self.workers:
-            worker.cancel()
+    def switchOff(self) -> None:
+        self.changeSwitchState(False)
