@@ -1,6 +1,7 @@
 from time import sleep
 from logging import getLogger
 
+import gpiozero
 from textual import work
 from textual.app import ComposeResult
 from textual.screen import Screen
@@ -28,13 +29,28 @@ class TiltLedScreen(Screen):
 
 
     def on_mount(self) -> None:
-        # ToDo: Implement the I/O
-        pass
+        self.tiltSens = gpiozero.InputDevice(CONFIG.interfaces.tiltPin, pull_up=False)
+        self.lastValue = not self.tiltSens.value
+        self.led = gpiozero.RGBLED(
+            red=CONFIG.interfaces.redPin,
+            green=CONFIG.interfaces.greenPin,
+            blue=CONFIG.interfaces.bluePin,
+            initial_value=(False, False, False),
+            pwm=False
+        )
+        self.updateGPIO()
 
 
     @work(thread=True)
     def updateGPIO(self) -> None:
-        # ToDo: Implement the change to I/O
+        state = self.tiltSens.value
+        if state != self.lastValue:
+            self.lastValue = state
+            logger.info(f"Tilt Switch State changed to: {'ON' if state else 'OFF'}")
+            if state:
+                self.led.color = (True, False, False)
+            else:
+                self.led.color = (False, True, False)
         sleep(0.1)
 
 
