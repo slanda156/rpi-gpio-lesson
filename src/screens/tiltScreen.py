@@ -32,8 +32,8 @@ class TiltScreen(Screen):
 
 
     def on_mount(self) -> None:
-        self.tiltSens = gpiozero.InputDevice(CONFIG.interfaces.tiltPin, pull_up=True)
-        self.lastValue = False
+        self.tiltSens = gpiozero.InputDevice(CONFIG.interfaces.tiltPin, pull_up=False)
+        self.lastValue = not self.tiltSens.value
 
 
     def changeSwitchState(self, state: bool) -> None:
