@@ -60,7 +60,7 @@ class HeartbeatScreen(Screen):
         heartbeatLEDState = self.query_one("#heartbeatSwitch", Switch).value
         self.heartLED.value = heartbeatLEDState
         if heartbeatLEDState:
-            cmd = [0b00000001, 0b10000000, 0b00000000]
+            cmd = [0b00000001, 0b00000000, 0b00000000]
             rawValue = self.spi.xfer2(cmd)
             if len(rawValue) != 3:
                 logger.error("Invalid SPI response length for Heartbeat Sensor")
