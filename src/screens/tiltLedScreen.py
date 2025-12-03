@@ -43,6 +43,9 @@ class TiltLedScreen(Screen):
 
     @work(thread=True)
     def updateGPIO(self) -> None:
+        if self.led is None:
+            logger.error("LED not initialized.")
+            return
         state = self.tiltSens.value
         if state != self.lastValue:
             self.lastValue = state
@@ -63,9 +66,17 @@ class TiltLedScreen(Screen):
 
 
     def on_screen_resume(self) -> None:
+        self.led = gpiozero.RGBLED(
+            red=CONFIG.interfaces.redPin,
+            green=CONFIG.interfaces.greenPin,
+            blue=CONFIG.interfaces.bluePin,
+            initial_value=(False, False, False),
+            pwm=False
+        )
         self.updateGPIO()
 
 
     def on_screen_suspend(self) -> None:
         for worker in self.workers:
             worker.cancel()
+        self.led = None

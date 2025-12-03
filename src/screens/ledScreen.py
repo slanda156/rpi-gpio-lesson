@@ -64,6 +64,9 @@ class LedScreen(Screen):
 
 
     def on_switch_changed(self, event: Switch.Changed) -> None:
+        if self.led is None:
+            logger.error("LED not initialized.")
+            return
         if event.switch.id in ("redSwitch", "greenSwitch", "blueSwitch"):
             logger.info(f"{event.switch.id} turned {'ON' if event.value else 'OFF'}")
             if event.switch.id == "redSwitch":
@@ -77,3 +80,11 @@ class LedScreen(Screen):
             self.led.value = tuple(values)
         else:
             logger.debug(f"Unknown switch changed: {event.switch.id}")
+
+
+    def on_screen_resume(self) -> None:
+        self.on_mount()
+
+
+    def on_screen_suspend(self) -> None:
+        self.led = None

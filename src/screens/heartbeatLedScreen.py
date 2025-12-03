@@ -40,6 +40,7 @@ class HeartbeatLedScreen(Screen):
         self.heartLED = gpiozero.LED(CONFIG.interfaces.heartbeatPin, initial_value=True)
         self.data = [0.0] * 100
         self.diffData = [0.0] * 100
+        self.updateGPIO()
 
 
     @work(thread=True)
@@ -57,6 +58,9 @@ class HeartbeatLedScreen(Screen):
 
 
     def updateHeartbeat(self, value: int) -> None:
+        if self.led is None:
+            logger.error("LED not initialized.")
+            return
         logger.debug(f"New Heartbeat value: {value}")
         self.data.append(value)
         while len(self.data) > 100:
@@ -84,9 +88,11 @@ class HeartbeatLedScreen(Screen):
 
 
     def on_screen_resume(self) -> None:
+        self.led = gpiozero.PWMLED(CONFIG.interfaces.redPin, initial_value=0)
         self.updateGPIO()
 
 
     def on_screen_suspend(self) -> None:
         for worker in self.workers:
             worker.cancel()
+        self.led = None
