@@ -32,9 +32,7 @@ class TiltScreen(Screen):
 
 
     def on_mount(self) -> None:
-        self.tiltSens = gpiozero.DigitalInputDevice(CONFIG.interfaces.tiltPin, pull_up=True)
-        self.tiltSens.when_activated = self.switchOff
-        self.tiltSens.when_deactivated = self.switchOn
+        self.tiltSens = gpiozero.InputDevice(CONFIG.interfaces.tiltPin, pull_up=True)
 
 
     def changeSwitchState(self, state: bool) -> None:
@@ -44,9 +42,25 @@ class TiltScreen(Screen):
         self.query_one("#tiltSwitchState", Switch).disabled = True
 
 
-    def switchOn(self) -> None:
-        self.changeSwitchState(True)
+    @work(thread=True)
+    def updateGPIO(self) -> None:
+        state = self.tiltSens.value
+        self.changeSwitchState(state)
+        sleep(0.1)
 
 
-    def switchOff(self) -> None:
-        self.changeSwitchState(False)
+    def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
+        if event.worker.state not in {WorkerState.RUNNING, WorkerState.SUCCESS}:
+            logger.debug(f"Worker state changed: {event.worker.name} is now {event.worker.state.name}")
+        if event.worker.name == "updateGPIO":
+            if event.worker.state in {WorkerState.ERROR, WorkerState.SUCCESS}:
+                self.updateGPIO()
+
+
+    def on_screen_resume(self) -> None:
+        self.updateGPIO()
+
+
+    def on_screen_suspend(self) -> None:
+        for worker in self.workers:
+            worker.cancel()
