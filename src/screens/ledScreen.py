@@ -57,3 +57,9 @@ class LedScreen(Screen):
             logger.info(f"Blue LED turned {'ON' if event.value else 'OFF'}")
         else:
             logger.debug(f"Unknown switch changed: {event.switch.id}")
+
+
+    def on_screen_resume(self) -> None:
+        self.redLed.off()
+        self.greenLed.off()
+        self.blueLed.off()

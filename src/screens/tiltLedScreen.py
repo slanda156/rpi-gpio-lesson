@@ -34,6 +34,8 @@ class TiltLedScreen(Screen):
         self.redLed = redLed
         self.greenLed = greenLed
         self.updateGPIO()
+        self.redLed.on()
+        self.greenLed.off()
 
 
     @work(thread=True)
@@ -61,6 +63,8 @@ class TiltLedScreen(Screen):
 
     def on_screen_resume(self) -> None:
         self.updateGPIO()
+        self.redLed.on()
+        self.greenLed.off()
 
 
     def on_screen_suspend(self) -> None:

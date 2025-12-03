@@ -35,6 +35,7 @@ class HeartbeatLedScreen(Screen):
         self.data = [0.0] * 100
         self.diffData = [0.0] * 100
         self.updateGPIO()
+        self.led.off()
 
 
     @work(thread=True)
@@ -81,6 +82,7 @@ class HeartbeatLedScreen(Screen):
 
     def on_screen_resume(self) -> None:
         self.updateGPIO()
+        self.led.off()
 
 
     def on_screen_suspend(self) -> None:
