@@ -33,13 +33,16 @@ class TiltScreen(Screen):
 
     def on_mount(self) -> None:
         self.tiltSens = gpiozero.InputDevice(CONFIG.interfaces.tiltPin, pull_up=True)
+        self.lastValue = False
 
 
     def changeSwitchState(self, state: bool) -> None:
-        logger.info(f"Tilt Switch State changed to: {'ON' if state else 'OFF'}")
-        self.query_one("#tiltSwitchState", Switch).disabled = False
-        self.query_one("#tiltSwitchState", Switch).value = state
-        self.query_one("#tiltSwitchState", Switch).disabled = True
+        if state != self.lastValue:
+            self.lastValue = state
+            logger.info(f"Tilt Switch State changed to: {'ON' if state else 'OFF'}")
+            self.query_one("#tiltSwitchState", Switch).disabled = False
+            self.query_one("#tiltSwitchState", Switch).value = state
+            self.query_one("#tiltSwitchState", Switch).disabled = True
 
 
     @work(thread=True)
