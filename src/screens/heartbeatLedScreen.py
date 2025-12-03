@@ -1,8 +1,6 @@
 from time import sleep
 from logging import getLogger
 
-import gpiozero
-import spidev
 from textual import work
 from textual.app import ComposeResult
 from textual.screen import Screen
@@ -11,6 +9,7 @@ from textual.containers import Horizontal
 from textual.worker import Worker, WorkerState
 
 from src.config import CONFIG
+from src.ioDevices import heartbeatLed, redLed, spi, openSPI
 
 
 logger = getLogger(__name__)
@@ -30,14 +29,9 @@ class HeartbeatLedScreen(Screen):
 
 
     def on_mount(self) -> None:
-        self.led = gpiozero.PWMLED(CONFIG.interfaces.redPin, initial_value=0)
-        self.spi = spidev.SpiDev()
-        path = "/dev/" + CONFIG.interfaces.spiInterface
-        logger.info(f"Opening SPI interface on {path}")
-        self.spi.open_path(path)
-        self.spi.max_speed_hz = 5000
-        self.spi.mode = 0b00
-        self.heartLED = gpiozero.LED(CONFIG.interfaces.heartbeatPin, initial_value=True)
+        self.led = redLed
+        self.spi = openSPI()
+        self.heartLED = heartbeatLed
         self.data = [0.0] * 100
         self.diffData = [0.0] * 100
         self.updateGPIO()
@@ -58,9 +52,6 @@ class HeartbeatLedScreen(Screen):
 
 
     def updateHeartbeat(self, value: int) -> None:
-        if self.led is None:
-            logger.error("LED not initialized.")
-            return
         logger.debug(f"New Heartbeat value: {value}")
         self.data.append(value)
         while len(self.data) > 100:
@@ -88,13 +79,9 @@ class HeartbeatLedScreen(Screen):
 
 
     def on_screen_resume(self) -> None:
-        self.on_mount()
+        self.updateGPIO()
 
 
     def on_screen_suspend(self) -> None:
         for worker in self.workers:
             worker.cancel()
-        if self.led is not None:
-            self.led.close()
-            self.led = None
-        self.spi.close()

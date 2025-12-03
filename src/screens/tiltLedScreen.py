@@ -1,7 +1,6 @@
 from time import sleep
 from logging import getLogger
 
-import gpiozero
 from textual import work
 from textual.app import ComposeResult
 from textual.screen import Screen
@@ -10,6 +9,7 @@ from textual.containers import Horizontal
 from textual.worker import Worker, WorkerState
 
 from src.config import CONFIG
+from src.ioDevices import tiltSens, redLed, greenLed
 
 
 logger = getLogger(__name__)
@@ -29,31 +29,25 @@ class TiltLedScreen(Screen):
 
 
     def on_mount(self) -> None:
-        self.tiltSens = gpiozero.InputDevice(CONFIG.interfaces.tiltPin, pull_up=False)
+        self.tiltSens = tiltSens
         self.lastValue = not self.tiltSens.value
-        self.led = gpiozero.RGBLED(
-            red=CONFIG.interfaces.redPin,
-            green=CONFIG.interfaces.greenPin,
-            blue=CONFIG.interfaces.bluePin,
-            initial_value=(False, False, False),
-            pwm=False
-        )
+        self.redLed = redLed
+        self.greenLed = greenLed
         self.updateGPIO()
 
 
     @work(thread=True)
     def updateGPIO(self) -> None:
-        if self.led is None:
-            logger.error("LED not initialized.")
-            return
         state = self.tiltSens.value
         if state != self.lastValue:
             self.lastValue = state
             logger.info(f"Tilt Switch State changed to: {'ON' if state else 'OFF'}")
             if state:
-                self.led.color = (True, False, False)
+                self.redLed.off()
+                self.greenLed.on()
             else:
-                self.led.color = (False, True, False)
+                self.redLed.on()
+                self.greenLed.off()
         sleep(0.1)
 
 
@@ -66,15 +60,9 @@ class TiltLedScreen(Screen):
 
 
     def on_screen_resume(self) -> None:
-        self.on_mount()
+        self.updateGPIO()
 
 
     def on_screen_suspend(self) -> None:
         for worker in self.workers:
             worker.cancel()
-        if self.led is not None:
-            self.led.close()
-            self.led = None
-        if self.tiltSens is not None:
-            self.tiltSens.close()
-            self.tiltSens = None

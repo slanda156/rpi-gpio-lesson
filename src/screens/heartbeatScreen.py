@@ -2,8 +2,6 @@ from time import sleep
 from logging import getLogger
 from random import randint
 
-import spidev
-import gpiozero
 from textual import work
 from textual.app import ComposeResult
 from textual.screen import Screen
@@ -12,7 +10,7 @@ from textual.containers import Horizontal
 from textual.worker import Worker, WorkerState
 
 from src.config import CONFIG
-
+from src.ioDevices import heartbeatLed, openSPI
 
 logger = getLogger(__name__)
 
@@ -35,13 +33,8 @@ class HeartbeatScreen(Screen):
 
 
     def on_mount(self) -> None:
-        self.spi = spidev.SpiDev()
-        path = "/dev/" + CONFIG.interfaces.spiInterface
-        logger.info(f"Opening SPI interface on {path}")
-        self.spi.open_path(path)
-        self.spi.max_speed_hz = 5000
-        self.spi.mode = 0b00
-        self.heartLED = gpiozero.LED(CONFIG.interfaces.heartbeatPin, initial_value=False)
+        self.spi = openSPI()
+        self.heartLED = heartbeatLed
         self.data = [0.0] * 100
         self.diffData = [0.0] * 100
 

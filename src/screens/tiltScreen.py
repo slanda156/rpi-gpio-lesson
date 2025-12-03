@@ -1,7 +1,6 @@
 from time import sleep
 from logging import getLogger
 
-import gpiozero
 from textual import work
 from textual.app import ComposeResult
 from textual.screen import Screen
@@ -10,6 +9,7 @@ from textual.containers import Horizontal
 from textual.worker import Worker, WorkerState
 
 from src.config import CONFIG
+from src.ioDevices import tiltSens
 
 
 logger = getLogger(__name__)
@@ -32,7 +32,7 @@ class TiltScreen(Screen):
 
 
     def on_mount(self) -> None:
-        self.tiltSens = gpiozero.InputDevice(CONFIG.interfaces.tiltPin, pull_up=False)
+        self.tiltSens = tiltSens
         self.lastValue = not self.tiltSens.value
         self.updateGPIO()
 
@@ -48,9 +48,6 @@ class TiltScreen(Screen):
 
     @work(thread=True)
     def updateGPIO(self) -> None:
-        if self.tiltSens is None:
-            logger.error("Tilt Sensor not initialized.")
-            return
         state = self.tiltSens.value
         self.changeSwitchState(state)
         sleep(0.1)
@@ -65,12 +62,9 @@ class TiltScreen(Screen):
 
 
     def on_screen_resume(self) -> None:
-        self.on_mount()
+        self.updateGPIO()
 
 
     def on_screen_suspend(self) -> None:
         for worker in self.workers:
             worker.cancel()
-        if self.tiltSens is not None:
-            self.tiltSens.close()
-            self.tiltSens = None
