@@ -9,7 +9,7 @@ from src.config import CONFIG
 logger = getLogger(__name__)
 
 tiltSens = gpiozero.InputDevice(CONFIG.interfaces.tiltPin, pull_up=False)
-redLed = gpiozero.PWMLED(CONFIG.interfaces.redPin, initial_value=0)
+redLed = gpiozero.LED(CONFIG.interfaces.redPin, initial_value=True)
 greenLed = gpiozero.LED(CONFIG.interfaces.greenPin, initial_value=True)
 blueLed = gpiozero.LED(CONFIG.interfaces.bluePin, initial_value=True)
 heartbeatLed = gpiozero.LED(CONFIG.interfaces.heartbeatPin, initial_value=False)

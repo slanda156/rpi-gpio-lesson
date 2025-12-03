@@ -65,9 +65,10 @@ class HeartbeatLedScreen(Screen):
         maxData = max(self.diffData)
         maxDiff = maxData - minData
         newValue = diffValue * (1 / maxDiff) if maxDiff != 0 else 0
-        if 0 <= newValue >= 1:
-            newValue = 1
-        self.led.value = newValue
+        if newValue < CONFIG.heartbeatThreshold:
+            self.led.off()
+        else:
+            self.led.on()
 
 
     def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
