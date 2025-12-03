@@ -21,7 +21,7 @@ handlers:
     backupCount: 5
 
 root:
-  level: DEBUG
+  level: INFO
   handlers: [rotating]
 
 loggers:
