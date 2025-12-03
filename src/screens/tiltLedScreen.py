@@ -66,17 +66,15 @@ class TiltLedScreen(Screen):
 
 
     def on_screen_resume(self) -> None:
-        self.led = gpiozero.RGBLED(
-            red=CONFIG.interfaces.redPin,
-            green=CONFIG.interfaces.greenPin,
-            blue=CONFIG.interfaces.bluePin,
-            initial_value=(False, False, False),
-            pwm=False
-        )
-        self.updateGPIO()
+        self.on_mount()
 
 
     def on_screen_suspend(self) -> None:
         for worker in self.workers:
             worker.cancel()
-        self.led = None
+        if self.led is not None:
+            self.led.close()
+            self.led = None
+        if self.tiltSens is not None:
+            self.tiltSens.close()
+            self.tiltSens = None

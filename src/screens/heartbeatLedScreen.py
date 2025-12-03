@@ -88,11 +88,13 @@ class HeartbeatLedScreen(Screen):
 
 
     def on_screen_resume(self) -> None:
-        self.led = gpiozero.PWMLED(CONFIG.interfaces.redPin, initial_value=0)
-        self.updateGPIO()
+        self.on_mount()
 
 
     def on_screen_suspend(self) -> None:
         for worker in self.workers:
             worker.cancel()
-        self.led = None
+        if self.led is not None:
+            self.led.close()
+            self.led = None
+        self.spi.close()

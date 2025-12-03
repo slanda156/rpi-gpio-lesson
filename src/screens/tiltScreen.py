@@ -48,6 +48,9 @@ class TiltScreen(Screen):
 
     @work(thread=True)
     def updateGPIO(self) -> None:
+        if self.tiltSens is None:
+            logger.error("Tilt Sensor not initialized.")
+            return
         state = self.tiltSens.value
         self.changeSwitchState(state)
         sleep(0.1)
@@ -62,9 +65,12 @@ class TiltScreen(Screen):
 
 
     def on_screen_resume(self) -> None:
-        self.updateGPIO()
+        self.on_mount()
 
 
     def on_screen_suspend(self) -> None:
         for worker in self.workers:
             worker.cancel()
+        if self.tiltSens is not None:
+            self.tiltSens.close()
+            self.tiltSens = None

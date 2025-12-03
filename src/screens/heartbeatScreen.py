@@ -102,9 +102,10 @@ class HeartbeatScreen(Screen):
 
 
     def on_screen_resume(self) -> None:
-        self.updateGPIO()
+        self.on_mount()
 
 
     def on_screen_suspend(self) -> None:
         for worker in self.workers:
             worker.cancel()
+        self.spi.close()

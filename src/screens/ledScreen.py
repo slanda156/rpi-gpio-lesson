@@ -87,4 +87,6 @@ class LedScreen(Screen):
 
 
     def on_screen_suspend(self) -> None:
-        self.led = None
+        if self.led is not None:
+            self.led.close()
+            self.led = None
