@@ -71,7 +71,8 @@ class LedScreen(Screen):
             red=CONFIG.interfaces.redPin,
             green=CONFIG.interfaces.greenPin,
             blue=CONFIG.interfaces.bluePin,
-            initial_value=(0, 0, 0)
+            initial_value=(0, 0, 0),
+            pwm=False
         )
 
 
@@ -116,5 +117,6 @@ class LedScreen(Screen):
                     pwmValue = self.query_one(f"#{event.switch.id[:-6]}PWM", Input).value
                     if pwmValue.isdecimal():
                         values[i] = int(pwmValue) / 100
+            self.led.value = tuple(values)
         else:
             logger.debug(f"Unknown switch changed: {event.switch.id}")
