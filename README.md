@@ -1,91 +1,62 @@
 # ESY
 
-A small Python project providing a textual UI with multiple screens (heartbeat, tilt, LED and logging) and simple configuration and logging support.
+## Installation
 
-**Project Overview**
-
-This project contains a small application whose entry point is `main.py`. The app uses code under the `src/` package and provides several screens in `src/screens/` including heartbeat and tilt displays, LED controls, and a log viewer. Configuration is stored in `config.yaml`, and logging is configured with `logger.yaml`.
-
-**Requirements**
-
-- **Python**: 3.8+
-- **Dependencies**: see `requirements.txt`.
-
-**Installation**
-
-- Create and activate a virtual environment (recommended):
-
-```bat
-python -m venv .venv
-.venv\Scripts\activate
+Zuerst wird das Repository geklont:
+``` bash
+git clone https://github.com/slanda156/rpi-gpio-lesson
 ```
 
-- Install dependencies:
+Die einstiegs Datei in das Programm muss ausfürbar gemacht werde.
 
-```bat
-pip install -r requirements.txt
+``` bash
+sudo chmod ug+x main.py
 ```
 
-On Unix/macOS use:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+Als Nächstes wird ein virtuelles Environment erzeugt und aktiviert:
+``` bash
+venv .venv
+sourve ./venv/bin/activate
 ```
 
-**Configuration**
-
-- `config.yaml`: main app configuration values. Edit this file to change runtime settings.
-- `logger.yaml`: logging configuration used by the app; adjust handlers/levels as needed.
-
-**Running the App**
-
-From the project root run:
-
-```bat
-python main.py
+Nun installieren wir die benötigten Module:
+``` bash
+pip install pip-tools
+pip-compile
+pip-sync
 ```
 
-Or on Unix/macOS:
+Jetzt sollten das Programm und alle Abhängigkeiten installiert sein.
 
-```bash
-python main.py
+## Nutzung des Programms
+
+Das Programm kann nun gestartet werden, solange das Virtuale Environment aktiv ist.
+
+``` bash
+./main.py
 ```
 
-The app will read `config.yaml` and `logger.yaml` by default and write runtime logs to the `logs/` folder.
+## Aufgaben
 
-**Project Structure**
+1. Gehe auf den Tab mit dem Tilt-Sensor. Kippe den Sensor und beobachte die Anzeige im Programm. Notiere deine Beobachtung.
 
-- `main.py`: application entry point.
-- `config.yaml`: application configuration.
-- `logger.yaml`: logging configuration.
-- `requirements.txt` / `requirements.in`: Python dependencies.
-- `src/`:
-  - `app.py`: core application logic and initialization.
-  - `config.py`: configuration helpers.
-  - `textualLogging.py`: logging helpers/integration.
-  - `dom.tcss`: styling or UI assets used by the textual UI.
-  - `screens/`: screen modules for the UI (heartbeat, tilt, LED, logs, start screen).
+2. Gehe auf den Tab mit der RGB-LED. Nutze die Schalter im Programm, um die LED zu steuern. Beobachte die entstehenden Farben.
+Notiere, wie viele Farben mit drei Schaltern möglich sind. Sind alle Farben gleich hell?
 
-**Logging**
+3. Gehe auf den Tab mit dem Heartbeat-Sensor. Halte einen Finger vor den Sensor. Zum Messen muss der Schalter im Programm eingeschaltet werden.
+Beobachte den Graphen. Was fällt dir auf?
+Versucht euren Herzschlag pro Minute zu messen.
 
-Logs are located in the `logs/` folder. `logger.yaml` configures how logs are formatted and rotated. Check that file to change log levels, formatters, or handlers.
+4. Gehe auf den Tab mit dem Tilt-Sensor und der LED.
+Kippt den Sensor. Notiert, wie der Sensor die LED beeinflusst.
 
-**Development**
+5. Gehe auf den Tab mit dem Heartbeat-Sensor und der LED.
+Beobachtet und notiert das Verhalten der LED.
 
-- Run the app locally using the commands above.
-- Modify code under `src/` and reload the app to test changes.
-- Consider using an editor with proper Python support (type checking, formatting).
+### Meta
 
-**Contributing**
+Christoph Heil – <christoph.heil156@gmail.com>
 
-If you want to contribute, please create a branch, add tests for new behavior, and open a PR with a clear description of your changes.
+Veröffentlicht unter der MIT-Lizenz. Siehe [``License``](LICENSE) für weitere Informationen.
 
-**License**
-
-This repository does not currently include an explicit license. Add a `LICENSE` file if you want to make licensing clear.
-
-**Contact / Notes**
-
-If you need help running or extending the project, provide details and I'll help with setup, debugging, or adding features.
+[https://github.com/slanda156/rpi-gpio-lesson](https://github.com/slanda156/rpi-gpio-lesson)
