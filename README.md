@@ -5,6 +5,7 @@
 Zuerst wird das Repository geklont:
 ``` bash
 git clone https://github.com/slanda156/rpi-gpio-lesson
+cd rpi-gpio-lesson
 ```
 
 Die einstiegs Datei in das Programm muss ausfürbar gemacht werde.
