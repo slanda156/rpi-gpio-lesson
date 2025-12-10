@@ -17,7 +17,7 @@ sudo chmod ug+x main.py
 Als Nächstes wird ein virtuelles Environment erzeugt und aktiviert:
 ``` bash
 python -m venv .venv
-sourve ./venv/bin/activate
+source .venv/bin/activate
 ```
 
 Nun installieren wir die benötigten Module:
