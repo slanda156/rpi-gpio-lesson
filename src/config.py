@@ -19,7 +19,7 @@ class InterfaceConfigModel(BaseModel):
 
 class ConfigModel(BaseModel):
     interfaces: InterfaceConfigModel = InterfaceConfigModel()
-    heartbeatThreshold: float = Field(default=0.5, ge=0.0, le=1.0)
+    heartbeatThreshold: float = Field(default=0.4, ge=0.0, le=1.0)
 
 
 def saveConfig(config: ConfigModel) -> None:
