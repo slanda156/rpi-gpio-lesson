@@ -16,7 +16,7 @@ sudo chmod ug+x main.py
 
 Als Nächstes wird ein virtuelles Environment erzeugt und aktiviert:
 ``` bash
-venv .venv
+python -m venv .venv
 sourve ./venv/bin/activate
 ```
 
