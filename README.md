@@ -54,6 +54,10 @@ Kippt den Sensor. Notiert, wie der Sensor die LED beeinflusst.
 5. Gehe auf den Tab mit dem Heartbeat-Sensor und der LED.
 Beobachtet und notiert das Verhalten der LED.
 
+## Probleme
+
+Der Graph für den Herzschlag funktioniert nicht richtig sowie die Herzschlag erkennung. Ich denke die Auflösung vom ADC könnte das Problem sein.
+
 ### Meta
 
 Christoph Heil – <christoph.heil156@gmail.com>
